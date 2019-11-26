@@ -10,32 +10,34 @@ export default class ExplorationsController {
 
     const explorationRepo: Repository<Explorations> = getManager().getRepository(Explorations);
     const bookingsRepo: Repository<Bookings> = getManager().getRepository(Bookings);
-    let initialFram = ctx.request.query.start;
+    const initialFram = ctx.request.query.start;
     let endFrame = ctx.request.query.end;
-    let clinicName = ctx.request.query.clinicName;
+    const clinicName = ctx.request.query.clinicName;
+    console.log(ctx.request.body.medications);
     const query = {};
+    const queryBookings = {};
     const formatDate = moment().format('YYYY-MM-DD');
+
+    if (initialFram !== undefined && endFrame !== undefined){
+      query['datetime'] = Between(initialFram, endFrame);
+    }
 
 
     if (initialFram === undefined) {
-      initialFram = formatDate;
+      /* initialFram = formatDate; */
+      query['datetime'] = Between(formatDate, endFrame);
     }
-    if (ctx.request.query.end === undefined) {
+    if (endFrame === undefined) {
       endFrame = moment(formatDate, 'YYYY-MM-DD').add('days', 5);
+      query['datetime'] = Between(formatDate, endFrame);
     }
 
-    if (clinicName === undefined) {
-      clinicName = true;
+    if (clinicName !== undefined) {
+      /* clinicName = true; */
+      query['clinicName'] = clinicName;
     }
 
-    // TODO: Falta validacion cuando nombre esta vacio; checar si puedes hacer query multiple con const query
-
-    /* if (schema && schema !== 'all') {
-      query['schema'] = schema;
-    } */
-
-    const bookings: Bookings[] = await bookingsRepo.find({ datetime: Between(initialFram, endFrame),
-    clinicName: clinicName});
+    const bookings: Bookings[] = await bookingsRepo.find(query);
 
   const ids = bookings.map((b) => b.id);
 
@@ -45,21 +47,6 @@ export default class ExplorationsController {
 
     ctx.status = 200;
     ctx.body = explorations;
-  }
-
-  public static async getBookings(ctx: BaseContext) {
-
-    const bookingsRepo: Repository<Bookings> = getManager().getRepository(Bookings);
-    const query = {};
-    /* if (schema && schema !== 'all') {
-      query['schema'] = schema;
-    } */
-
-    const booking: Bookings[] = await bookingsRepo.find();
-
-    ctx.status = 200;
-    ctx.body = booking;
-  }
-
+  } 
 
 }
