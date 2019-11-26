@@ -8,6 +8,10 @@ import { Bookings } from '../entity/bookings';
 export default class ExplorationsController {
   public static async getExplorations(ctx: BaseContext) {
 
+    console.log(ctx);
+
+
+
     const explorationRepo: Repository<Explorations> = getManager().getRepository(Explorations);
     const bookingsRepo: Repository<Bookings> = getManager().getRepository(Bookings);
     const initialFram = ctx.request.query.start;
@@ -17,7 +21,7 @@ export default class ExplorationsController {
     const queryBookings = {};
     const formatDate = moment().format('YYYY-MM-DD');
 
-    if (initialFram !== undefined && endFrame !== undefined){
+    if (initialFram !== undefined && endFrame !== undefined) {
       query['datetime'] = Between(initialFram, endFrame);
     }
 
@@ -48,9 +52,9 @@ export default class ExplorationsController {
        const medications = ctx.request.body.medicationsAll;
        explorations = explorations.filter((e) => JSON.stringify(e.consumedMedications.replace(/[\[\]']+/g, '').trim().split(',')) === JSON.stringify(medications) );
     }
-    if (ctx.request.body.medicationsSome !== undefined){
-       const medications = ctx.request.body.medicationsAll;
-       explorations = explorations.filter((e) => e.consumedMedications.replace(/[\[\]']+/g, '').trim().split(',').some((c) => )  );
+    if (ctx.request.body.medicationsSome !== undefined) {
+       const medications = ctx.request.body.medicationsSome;
+       explorations = explorations.filter((e) => e.consumedMedications.replace(/[\[\]']+/g, '').trim().split(',').some((c) =>  medications.indexOf(c) !== -1));
     }
 
 

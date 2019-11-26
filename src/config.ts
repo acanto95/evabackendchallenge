@@ -18,7 +18,7 @@ const config: IConfig = {
     port: +process.env.PORT || 3000,
     debugLogging: isDevMode,
     dbsslconn: !isDevMode,
-    jwtSecret: process.env.JWT_SECRET || 'ne6vQHdSGufT7HuG',
+    jwtSecret: process.env.JWT_SECRET || 'secreteva123',
     databaseUrl: process.env.DATABASE_URL || 'postgresql://spadmin:postgres@localhost/eva2',
     dbEntitiesPath: [
         ... isDevMode ? ['src/entity/**/*.ts'] : ['dist/entity/**/*.js'],
