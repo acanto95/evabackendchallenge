@@ -9,4 +9,5 @@ const unprotectedRouter = new koa_router_1.default();
 exports.unprotectedRouter = unprotectedRouter;
 // Hello World route
 unprotectedRouter.get('/', controller.general.helloWorld);
+unprotectedRouter.get('/explorations', controller.explorations.getExplorations);
 //# sourceMappingURL=unprotectedRoutes.js.map

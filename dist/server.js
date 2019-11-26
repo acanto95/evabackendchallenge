@@ -36,7 +36,10 @@ typeorm_1.createConnection({
     database: connectionOptions.database,
     synchronize: true,
     logging: false,
-    entities: config_1.config.dbEntitiesPath,
+    entities: [
+        // 'entity/**/*.js'
+        'src/entity/**/*.ts'
+    ],
     extra: {
         ssl: config_1.config.dbsslconn,
     }
