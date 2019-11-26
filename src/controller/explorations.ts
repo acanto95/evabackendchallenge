@@ -13,7 +13,6 @@ export default class ExplorationsController {
     const initialFram = ctx.request.query.start;
     let endFrame = ctx.request.query.end;
     const clinicName = ctx.request.query.clinicName;
-    console.log(ctx.request.body.medications);
     const query = {};
     const queryBookings = {};
     const formatDate = moment().format('YYYY-MM-DD');
@@ -39,14 +38,25 @@ export default class ExplorationsController {
 
     const bookings: Bookings[] = await bookingsRepo.find(query);
 
-  const ids = bookings.map((b) => b.id);
+    const ids = bookings.map((b) => b.id);
 
-    const explorations: Explorations[] = await explorationRepo.find({
-      bookingId: In(ids)
-    });
+    queryBookings['bookingId'] = In(ids);
+
+    let explorations: Explorations[] = await explorationRepo.find(queryBookings);
+
+    if (ctx.request.body.medicationsAll !== undefined){
+       const medications = ctx.request.body.medicationsAll;
+       explorations = explorations.filter((e) => JSON.stringify(e.consumedMedications.replace(/[\[\]']+/g, '').trim().split(',')) === JSON.stringify(medications) );
+    }
+    if (ctx.request.body.medicationsSome !== undefined){
+       const medications = ctx.request.body.medicationsAll;
+       explorations = explorations.filter((e) => e.consumedMedications.replace(/[\[\]']+/g, '').trim().split(',').some((c) => )  );
+    }
+
+
 
     ctx.status = 200;
     ctx.body = explorations;
-  } 
+  }
 
 }
