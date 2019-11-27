@@ -8,10 +8,6 @@ import { Bookings } from '../entity/bookings';
 export default class ExplorationsController {
   public static async getExplorations(ctx: BaseContext) {
 
-    console.log(ctx);
-
-
-
     const explorationRepo: Repository<Explorations> = getManager().getRepository(Explorations);
     const bookingsRepo: Repository<Bookings> = getManager().getRepository(Bookings);
     const initialFram = ctx.request.query.start;
@@ -22,21 +18,26 @@ export default class ExplorationsController {
     const formatDate = moment().format('YYYY-MM-DD');
 
     if (initialFram !== undefined && endFrame !== undefined) {
+
+      if (initialFram > endFrame) {
+        ctx.status = 400;
+      ctx.body = {message: 'The start date is greater than the end date'};
+      return;
+      }
       query['datetime'] = Between(initialFram, endFrame);
     }
 
 
     if (initialFram === undefined) {
-      /* initialFram = formatDate; */
       query['datetime'] = Between(formatDate, endFrame);
     }
+
     if (endFrame === undefined) {
       endFrame = moment(formatDate, 'YYYY-MM-DD').add('days', 5);
       query['datetime'] = Between(formatDate, endFrame);
     }
 
     if (clinicName !== undefined) {
-      /* clinicName = true; */
       query['clinicName'] = clinicName;
     }
 
@@ -48,6 +49,7 @@ export default class ExplorationsController {
 
     let explorations: Explorations[] = await explorationRepo.find(queryBookings);
 
+
     if (ctx.request.body.medicationsAll !== undefined){
        const medications = ctx.request.body.medicationsAll;
        explorations = explorations.filter((e) => JSON.stringify(e.consumedMedications.replace(/[\[\]']+/g, '').trim().split(',')) === JSON.stringify(medications) );
@@ -57,7 +59,14 @@ export default class ExplorationsController {
        explorations = explorations.filter((e) => e.consumedMedications.replace(/[\[\]']+/g, '').trim().split(',').some((c) =>  medications.indexOf(c) !== -1));
     }
 
-
+    explorations = explorations.map((b) => {
+      const booking = bookings.find((e) => e.id === b.bookingId);
+      b['name'] = booking.name;
+      b['email'] = booking.email;
+      b['datetime'] = booking.datetime;
+      b['clinicName'] = booking.clinicName;
+      return b;
+    });
 
     ctx.status = 200;
     ctx.body = explorations;
