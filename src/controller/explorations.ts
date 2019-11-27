@@ -33,13 +33,13 @@ export default class ExplorationsController {
     }
 
 
-    if (initialFram === undefined) {
-      query['datetime'] = Between(formatDate, endFrame);
+    if (initialFram === undefined && endFrame !== undefined) {
+      query['datetime'] = LessThan(endFrame);
     }
 
-    if (endFrame === undefined) {
+    if (endFrame === undefined && initialFram !== undefined) {
       endFrame = moment(formatDate, 'YYYY-MM-DD').add('days', 5);
-      query['datetime'] = Between(formatDate, endFrame);
+      query['datetime'] = MoreThan(initialFram);
     }
 
     if (clinicName !== undefined) {
