@@ -8,6 +8,12 @@ import { Bookings } from '../entity/bookings';
 export default class ExplorationsController {
   public static async getExplorations(ctx: BaseContext) {
 
+    if(!ctx.state.user.team || ctx.state.user.team !== 'data-science') {
+      ctx.status = 400;
+      ctx.body = {message: 'Your user is not allowed to access this information'};
+      return;
+    }
+
     const explorationRepo: Repository<Explorations> = getManager().getRepository(Explorations);
     const bookingsRepo: Repository<Bookings> = getManager().getRepository(Bookings);
     const initialFram = ctx.request.query.start;
@@ -18,7 +24,6 @@ export default class ExplorationsController {
     const formatDate = moment().format('YYYY-MM-DD');
 
     if (initialFram !== undefined && endFrame !== undefined) {
-
       if (initialFram > endFrame) {
         ctx.status = 400;
       ctx.body = {message: 'The start date is greater than the end date'};
