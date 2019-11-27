@@ -18,7 +18,7 @@ export default class ExplorationsController {
     const bookingsRepo: Repository<Bookings> = getManager().getRepository(Bookings);
     const initialFram = ctx.request.query.start;
     let endFrame = ctx.request.query.end;
-    const clinicName = ctx.request.query.clinicName;
+    let clinicName = ctx.request.query.clinicName;
     const query = {};
     const queryBookings = {};
     const formatDate = moment().format('YYYY-MM-DD');
@@ -43,6 +43,7 @@ export default class ExplorationsController {
     }
 
     if (clinicName !== undefined) {
+      clinicName = clinicName.toUpperCase();
       query['clinicName'] = clinicName;
     }
 
