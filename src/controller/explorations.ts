@@ -8,7 +8,8 @@ import { Bookings } from '../entity/bookings';
 export default class ExplorationsController {
   public static async getExplorations(ctx: BaseContext) {
 
-    if(!ctx.state.user.team || ctx.state.user.team !== 'data-science') {
+    // authentication only for data team
+    if (!ctx.state.user.team || ctx.state.user.team !== 'data-science') {
       ctx.status = 400;
       ctx.body = {message: 'Your user is not allowed to access this information'};
       return;
@@ -23,6 +24,7 @@ export default class ExplorationsController {
     const queryBookings = {};
     const formatDate = moment().format('YYYY-MM-DD');
 
+    // dates validations
     if (initialFram !== undefined && endFrame !== undefined) {
       if (initialFram > endFrame) {
         ctx.status = 400;
@@ -42,6 +44,7 @@ export default class ExplorationsController {
       query['datetime'] = MoreThan(initialFram);
     }
 
+    // clinicName validations
     if (clinicName !== undefined) {
       clinicName = clinicName.toUpperCase();
       query['clinicName'] = clinicName;
@@ -49,14 +52,16 @@ export default class ExplorationsController {
 
     const bookings: Bookings[] = await bookingsRepo.find(query);
 
+    // get only ids from bookings
     const ids = bookings.map((b) => b.id);
 
     queryBookings['bookingId'] = In(ids);
 
+    // find explorations with the bookingIds found
     let explorations: Explorations[] = await explorationRepo.find(queryBookings);
 
-
-    if (ctx.request.body.medicationsAll !== undefined){
+    // filter by body fields (medicationsAll, medicationsSome)
+    if (ctx.request.body.medicationsAll !== undefined) {
        const medications = ctx.request.body.medicationsAll;
        explorations = explorations.filter((e) => JSON.stringify(e.consumedMedications.replace(/[\[\]']+/g, '').trim().split(',')) === JSON.stringify(medications) );
     }
@@ -65,6 +70,7 @@ export default class ExplorationsController {
        explorations = explorations.filter((e) => e.consumedMedications.replace(/[\[\]']+/g, '').trim().split(',').some((c) =>  medications.indexOf(c) !== -1));
     }
 
+    // join information
     explorations = explorations.map((b) => {
       const booking = bookings.find((e) => e.id === b.bookingId);
       b['name'] = booking.name;
