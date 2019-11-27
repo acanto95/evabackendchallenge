@@ -31,7 +31,17 @@ export default class ExplorationsController {
       ctx.body = {message: 'The start date is greater than the end date'};
       return;
       }
-      query['datetime'] = Between(initialFram, endFrame);
+
+      if (initialFram === endFrame){
+        const init = moment(initialFram).set({hour: 0,minute: 0,second:0,millisecond:0}).format('YYYY-MM-DD:HHmmss');
+        console.log(init);
+        const ending = moment(endFrame).set({hour: 23,minute: 58,second:0,millisecond:0}).format('YYYY-MM-DD:HHmmss');
+        console.log(ending)
+        query['datetime'] = Between(init, ending);
+      } else {
+        query['datetime'] = Between(initialFram, endFrame);
+      }
+
     }
 
 
