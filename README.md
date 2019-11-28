@@ -138,3 +138,8 @@ GF0YS1zY2llbmNlIn0.1Z7wXwxENnvfXiVUMBnY4_JoS5uyaNnVNbkDYjUgBBs
 ```
 
 Para usarlo se necesita usar con autenticación Bearer dentro de la llamda que se haga
+
+
+## Testing
+
+Se incluye un archivo excel con pruebas sencillas del endpoint.

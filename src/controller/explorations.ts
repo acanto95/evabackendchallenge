@@ -10,7 +10,7 @@ export default class ExplorationsController {
 
     // authentication only for data team
     if (!ctx.state.user.team || ctx.state.user.team !== 'data-science') {
-      ctx.status = 400;
+      ctx.status = 403;
       ctx.body = {message: 'Your user is not allowed to access this information'};
       return;
     }
@@ -34,9 +34,7 @@ export default class ExplorationsController {
 
       if (initialFram === endFrame){
         const init = moment(initialFram).set({hour: 0,minute: 0,second:0,millisecond:0}).format('YYYY-MM-DD:HHmmss');
-        console.log(init);
         const ending = moment(endFrame).set({hour: 23,minute: 58,second:0,millisecond:0}).format('YYYY-MM-DD:HHmmss');
-        console.log(ending)
         query['datetime'] = Between(init, ending);
       } else {
         query['datetime'] = Between(initialFram, endFrame);
